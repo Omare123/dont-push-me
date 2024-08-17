@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3 uid="uid://bsmg6l7hi2bww"]
+
+[ext_resource type="Script" path="res://Scripts/Player.gd" id="1_8l5v8"]
+[ext_resource type="Texture2D" uid="uid://xy7fvm1i6qna" path="res://Assets/top down kitchen.png" id="2_h15as"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_d7pwc"]
+size = Vector2(16, 16)
+
+[node name="Cup" type="CharacterBody2D"]
+top_level = true
+script = ExtResource("1_8l5v8")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_h15as")
+hframes = 18
+vframes = 6
+frame = 32
+
+[node name="Camera2D" type="Camera2D" parent="Sprite2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_d7pwc")
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+target_position = Vector2(0, 16)
