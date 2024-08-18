@@ -1,10 +1,13 @@
-[gd_scene load_steps=4 format=3 uid="uid://bsmg6l7hi2bww"]
+[gd_scene load_steps=5 format=3 uid="uid://bsmg6l7hi2bww"]
 
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="1_8l5v8"]
 [ext_resource type="Texture2D" uid="uid://xy7fvm1i6qna" path="res://Assets/top down kitchen.png" id="2_h15as"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d7pwc"]
 size = Vector2(16, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_etw76"]
+size = Vector2(15, 15)
 
 [node name="Cup" type="CharacterBody2D"]
 top_level = true
@@ -22,4 +25,15 @@ frame = 32
 shape = SubResource("RectangleShape2D_d7pwc")
 
 [node name="RayCast2D" type="RayCast2D" parent="."]
+target_position = Vector2(0, 32)
+
+[node name="ObjectsRayCast" type="RayCast2D" parent="."]
 target_position = Vector2(0, 16)
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_etw76")
+
+[connection signal="area_entered" from="Area2D" to="." method="_on_area_2d_area_entered"]
+[connection signal="area_exited" from="Area2D" to="." method="_on_area_2d_area_exited"]

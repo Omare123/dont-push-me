@@ -83,7 +83,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o6ws4"]
-size = Vector2(16, 16)
+size = Vector2(15, 15)
 
 [node name="Cat" type="CharacterBody2D"]
 top_level = true
@@ -92,7 +92,7 @@ script = ExtResource("1_gjiqq")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_ou1bd")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_d2bw8")
 animation = &"idle"
 
@@ -103,3 +103,4 @@ shape = SubResource("RectangleShape2D_o6ws4")
 
 [node name="RayCast2D" type="RayCast2D" parent="."]
 target_position = Vector2(0, -16)
+collide_with_areas = true
