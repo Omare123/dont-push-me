@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://cvdbdmfm76nuf"]
+
+[ext_resource type="AudioStream" uid="uid://c7xxuexv83ppn" path="res://Assets/Music/Kitty-cat.mp3" id="1_p8qaw"]
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer"]
+stream = ExtResource("1_p8qaw")
+autoplay = true
+bus = &"Background"

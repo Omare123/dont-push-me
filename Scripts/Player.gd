@@ -4,6 +4,8 @@ extends CharacterBody2D
 @onready var sprite = $Sprite2D
 @onready var enemies_ray_cast = $RayCast2D
 @onready var objects_ray_cast = $ObjectsRayCast
+@onready var walk = $sfx/walk
+@onready var breaking = $sfx/breaking
 
 signal moving
 var last_check_point = Vector2i(5,1)
@@ -43,20 +45,19 @@ func move(direction: Vector2, is_attack = false):
 	var is_dead_zone: bool = is_dead_zone(tile_data)
 	if not is_tile_walkable(tile_data) && !(is_dead_zone and is_attack):
 		return
-		
-	
 	
 	if is_enemy_in_the_way(direction) || is_object_in_the_way(direction):
 		return
 	is_moving = true
 	
 	if (is_dead_zone and is_attack):
-		get_tree().reload_current_scene()
+		breaking.play()
 		return
 	var tween := create_tween().set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
 	tween.tween_property(self, "global_position", global_position - Vector2(0, 1), 0.1)
 	tween.tween_property(sprite, "scale", sprite.scale + Vector2(0.1, 0.1), 0.1)
 	tween.tween_property(self, "global_position", tile_map.map_to_local(target_tile), 0.1)
+	walk.play()
 	await tween.tween_property(sprite, "scale", sprite.scale, 0.1).finished
 	global_position = tile_map.map_to_local(target_tile)
 	if colliding:
@@ -93,3 +94,7 @@ func _on_area_2d_area_exited(area):
 func _on_win_area_body_entered(body):
 	if body == self:
 		Game.next_level()
+
+
+func _on_breaking_finished():
+	get_tree().reload_current_scene()

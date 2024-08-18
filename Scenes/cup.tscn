@@ -1,13 +1,32 @@
-[gd_scene load_steps=5 format=3 uid="uid://bsmg6l7hi2bww"]
+[gd_scene load_steps=12 format=3 uid="uid://bsmg6l7hi2bww"]
 
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="1_8l5v8"]
 [ext_resource type="Texture2D" uid="uid://xy7fvm1i6qna" path="res://Assets/top down kitchen.png" id="2_h15as"]
+[ext_resource type="AudioStream" uid="uid://dd2t1drjuvawx" path="res://Assets/SFX/cup_1.wav" id="3_e6y5n"]
+[ext_resource type="AudioStream" uid="uid://ceoy3ltxkeq48" path="res://Assets/SFX/cup_2.wav" id="4_o7sih"]
+[ext_resource type="AudioStream" uid="uid://d2boo34tusdf0" path="res://Assets/SFX/cup_3.wav" id="5_mmemy"]
+[ext_resource type="AudioStream" uid="uid://bmhvq0lvaqrx0" path="res://Assets/SFX/cup_4.wav" id="6_phmj1"]
+[ext_resource type="AudioStream" uid="uid://cu8yglbc008m7" path="res://Assets/SFX/cup_5.wav" id="7_hec1b"]
+[ext_resource type="AudioStream" uid="uid://bw7ushw4gihov" path="res://Assets/SFX/cup_break.wav" id="8_e6mpo"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d7pwc"]
 size = Vector2(16, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_etw76"]
 size = Vector2(15, 15)
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_t6bkw"]
+streams_count = 5
+stream_0/stream = ExtResource("3_e6y5n")
+stream_0/weight = 1.0
+stream_1/stream = ExtResource("4_o7sih")
+stream_1/weight = 1.0
+stream_2/stream = ExtResource("5_mmemy")
+stream_2/weight = 1.0
+stream_3/stream = ExtResource("6_phmj1")
+stream_3/weight = 1.0
+stream_4/stream = ExtResource("7_hec1b")
+stream_4/weight = 1.0
 
 [node name="Cup" type="CharacterBody2D"]
 top_level = true
@@ -35,5 +54,14 @@ target_position = Vector2(0, 16)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("RectangleShape2D_etw76")
 
+[node name="sfx" type="Node" parent="."]
+
+[node name="walk" type="AudioStreamPlayer2D" parent="sfx"]
+stream = SubResource("AudioStreamRandomizer_t6bkw")
+
+[node name="breaking" type="AudioStreamPlayer2D" parent="sfx"]
+stream = ExtResource("8_e6mpo")
+
 [connection signal="area_entered" from="Area2D" to="." method="_on_area_2d_area_entered"]
 [connection signal="area_exited" from="Area2D" to="." method="_on_area_2d_area_exited"]
+[connection signal="finished" from="sfx/breaking" to="." method="_on_breaking_finished"]
