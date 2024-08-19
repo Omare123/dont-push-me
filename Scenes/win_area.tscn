@@ -1,11 +1,19 @@
-[gd_scene load_steps=2 format=3 uid="uid://b0m8scayusj2f"]
+[gd_scene load_steps=3 format=3 uid="uid://b0m8scayusj2f"]
+
+[ext_resource type="Texture2D" uid="uid://xy7fvm1i6qna" path="res://Assets/top down kitchen.png" id="1_rlxaf"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_x2f5i"]
-size = Vector2(48, 16)
+size = Vector2(48, 12)
 
 [node name="Win Area" type="Area2D"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_x2f5i")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_rlxaf")
+hframes = 6
+vframes = 8
+frame = 42
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

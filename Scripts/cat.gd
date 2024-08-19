@@ -4,14 +4,21 @@ extends CharacterBody2D
 @export var tile_map: TileMap
 @onready var sprite = $Sprite
 @onready var ray_cast_2d = $RayCast2D
+@onready var area_2d = $Area2D
+@onready var next_step_indicator = $next_step_indicator
 
 
 const HORIZONTAL = "H"
 const VERTICAL = "V"
+const FRONT = "F"
+const SIDE = "S"
 @export_enum(HORIZONTAL, VERTICAL) var orientation: String = HORIZONTAL
-
+@export_enum(SIDE, FRONT) var attack_orientation: String = SIDE
 var is_moving = false
 var facing_direction = Vector2i(0, -1)
+var colliding = false
+var last_position: Vector2i
+var next_position: Vector2i
 
 func _ready():
 	var current_tile: Vector2i = tile_map.local_to_map(global_position)
@@ -24,8 +31,9 @@ func _ready():
 		VERTICAL:
 			facing_direction = Vector2i(0, -1)
 			
-	get_target_tile(current_tile)
-
+	next_position = get_target_tile(current_tile)
+	move_next_step_indicator()
+	
 func _process(_delta):
 	if ray_cast_2d.is_colliding():
 		var collider = ray_cast_2d.get_collider()
@@ -38,12 +46,14 @@ func move():
 		
 	is_moving = true
 	var current_tile: Vector2i = tile_map.local_to_map(global_position)
-	var target_tile = get_target_tile(current_tile)
-	
+	var step = tile_map.map_to_local(next_position)
 	var tween := create_tween().set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
 	tween.tween_property(self, "global_position", global_position - Vector2(0, 1), 0.1)
-	await tween.tween_property(self, "global_position", tile_map.map_to_local(target_tile), 0.1).finished
-	global_position = tile_map.map_to_local(target_tile)
+	await tween.tween_property(self, "global_position", step, 0.1).finished
+	global_position = step
+	next_position = get_target_tile(next_position)
+	move_next_step_indicator()
+	last_position = current_tile
 	is_moving = false
 
 func is_tile_walkable(tile_data: TileData):
@@ -55,19 +65,28 @@ func is_dead_zone(tile_data: TileData):
 	return tile_data != null && tile_data.get_custom_data("dead_zone")
 
 func get_attack_direction():
-	randomize()
-	var i = randi()
-	if i % 2 == 0:
-		return Vector2.RIGHT
+	if attack_orientation == FRONT:
+		return facing_direction
 	else:
-		return Vector2.LEFT
+		randomize()
+		var i = randi()
+		if orientation == VERTICAL:
+			if i % 2 == 0:
+				return Vector2.RIGHT
+			else:
+				return Vector2.LEFT
+		else:
+			if i % 2 == 0:
+				return Vector2.UP
+			else:
+				return Vector2.DOWN
 
 func get_target_tile(current_tile: Vector2i):
 	var repeat = true
 	while repeat:
 		var posible_target_tile: Vector2i = Vector2i(
 			current_tile.x + facing_direction.x,
-			current_tile.y + facing_direction.y
+			current_tile.y + facing_direction.y 
 		)
 		var tile_data: TileData = tile_map.get_cell_tile_data(1, posible_target_tile)
 		ray_cast_2d.target_position = facing_direction * 16
@@ -87,3 +106,13 @@ func get_target_tile(current_tile: Vector2i):
 
 func _on_cup_moving():
 	move()
+
+func move_next_step_indicator():
+	var indicator_tween := next_step_indicator.create_tween().set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN_OUT)
+	await indicator_tween.tween_property(next_step_indicator, "global_position", tile_map.map_to_local(next_position), 0.2).finished
+	
+	
+func _on_area_2d_area_entered(area):
+	if area.get_parent() is Player:
+		next_position = last_position
+		move()

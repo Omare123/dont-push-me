@@ -1,7 +1,8 @@
-[gd_scene load_steps=15 format=3 uid="uid://dldiieo1pr1js"]
+[gd_scene load_steps=16 format=3 uid="uid://dldiieo1pr1js"]
 
 [ext_resource type="Script" path="res://Scripts/cat.gd" id="1_gjiqq"]
 [ext_resource type="Texture2D" uid="uid://brtcleprw67bb" path="res://Assets/CatsBlack16x16Tile.png" id="1_wrknn"]
+[ext_resource type="PackedScene" uid="uid://cdm4d0qsovhxl" path="res://Scenes/next_step_indicator.tscn" id="3_gqy3w"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ou1bd"]
 size = Vector2(16, 16)
@@ -83,7 +84,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o6ws4"]
-size = Vector2(15, 15)
+size = Vector2(14, 14)
 
 [node name="Cat" type="CharacterBody2D"]
 top_level = true
@@ -104,3 +105,10 @@ shape = SubResource("RectangleShape2D_o6ws4")
 [node name="RayCast2D" type="RayCast2D" parent="."]
 target_position = Vector2(0, -16)
 collide_with_areas = true
+
+[node name="next_step_indicator" parent="." instance=ExtResource("3_gqy3w")]
+
+[connection signal="area_entered" from="Area2D" to="." method="_on_area_2d_area_entered"]
+[connection signal="area_exited" from="Area2D" to="." method="_on_area_2d_area_exited"]
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
+[connection signal="body_exited" from="Area2D" to="." method="_on_area_2d_body_exited"]

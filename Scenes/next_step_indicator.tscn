@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://cdm4d0qsovhxl"]
+
+[ext_resource type="Texture2D" uid="uid://xy7fvm1i6qna" path="res://Assets/top down kitchen.png" id="1_blrau"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eyqnm"]
+atlas = ExtResource("1_blrau")
+region = Rect2(64, 112, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nsjd3"]
+atlas = ExtResource("1_blrau")
+region = Rect2(80, 112, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_lodgp"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eyqnm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nsjd3")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="next_step_indicator" type="AnimatedSprite2D"]
+sprite_frames = SubResource("SpriteFrames_lodgp")
+autoplay = "default"
+frame_progress = 0.86021

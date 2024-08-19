@@ -10,7 +10,7 @@ extends CharacterBody2D
 signal moving
 var last_check_point = Vector2i(5,1)
 var is_moving = false
-var colliding = false
+
 func _process(_delta):
 	if is_moving:
 		return
@@ -50,18 +50,19 @@ func move(direction: Vector2, is_attack = false):
 		return
 	is_moving = true
 	
+	var tween := create_tween().set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
+	
 	if (is_dead_zone and is_attack):
+		tween.tween_property(self, "global_position", tile_map.map_to_local(target_tile), 0.1)
 		breaking.play()
 		return
-	var tween := create_tween().set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
+		
 	tween.tween_property(self, "global_position", global_position - Vector2(0, 1), 0.1)
 	tween.tween_property(sprite, "scale", sprite.scale + Vector2(0.1, 0.1), 0.1)
 	tween.tween_property(self, "global_position", tile_map.map_to_local(target_tile), 0.1)
 	walk.play()
 	await tween.tween_property(sprite, "scale", sprite.scale, 0.1).finished
 	global_position = tile_map.map_to_local(target_tile)
-	if colliding:
-		global_position = tile_map.map_to_local(current_tile)
 	is_moving = false
 
 func is_enemy_in_the_way(direction: Vector2):
@@ -83,13 +84,6 @@ func is_object_in_the_way(direction: Vector2):
 			return false
 		return true
 	return false
-
-func _on_area_2d_area_entered(area):
-	colliding = true
-
-func _on_area_2d_area_exited(area):
-	colliding = false
-
 
 func _on_win_area_body_entered(body):
 	if body == self:
