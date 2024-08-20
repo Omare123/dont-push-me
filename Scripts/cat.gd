@@ -6,6 +6,7 @@ extends CharacterBody2D
 @onready var ray_cast_2d = $RayCast2D
 @onready var area_2d = $Area2D
 @onready var next_step_indicator = $next_step_indicator
+@onready var animation_tree = $AnimationTree
 
 
 const HORIZONTAL = "H"
@@ -14,12 +15,12 @@ const FRONT = "F"
 const SIDE = "S"
 @export_enum(HORIZONTAL, VERTICAL) var orientation: String = HORIZONTAL
 @export_enum(SIDE, FRONT) var attack_orientation: String = SIDE
-var is_moving = false
+
 var facing_direction = Vector2i(0, -1)
 var colliding = false
 var last_position: Vector2i
 var next_position: Vector2i
-
+var moving: bool = false
 func _ready():
 	var current_tile: Vector2i = tile_map.local_to_map(global_position)
 	if current_tile == null:
@@ -39,12 +40,14 @@ func _process(_delta):
 		var collider = ray_cast_2d.get_collider()
 		if collider is Player:
 			collider.move(get_attack_direction(), true)
+			set_animation_conditions("parameters/conditions/attacking")
 
 func move():
-	if is_moving:
+	if moving:
 		return
-		
-	is_moving = true
+	moving = true
+	update_blend_directions()
+	set_animation_conditions("parameters/conditions/walking")
 	var current_tile: Vector2i = tile_map.local_to_map(global_position)
 	var step = tile_map.map_to_local(next_position)
 	var tween := create_tween().set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
@@ -54,7 +57,7 @@ func move():
 	next_position = get_target_tile(next_position)
 	move_next_step_indicator()
 	last_position = current_tile
-	is_moving = false
+	moving = false
 
 func is_tile_walkable(tile_data: TileData):
 	if (tile_data == null || tile_data.get_custom_data("walkable") == false || tile_data.get_custom_data("walkable") == null):
@@ -88,20 +91,23 @@ func get_target_tile(current_tile: Vector2i):
 			current_tile.x + facing_direction.x,
 			current_tile.y + facing_direction.y 
 		)
+		update_blend_directions()
 		var tile_data: TileData = tile_map.get_cell_tile_data(1, posible_target_tile)
 		ray_cast_2d.target_position = facing_direction * 16
 		ray_cast_2d.force_raycast_update()
-		
+		if not is_tile_walkable(tile_data) || is_dead_zone(tile_data):
+			facing_direction = facing_direction * -1
+			continue
+			
 		if ray_cast_2d.is_colliding():
 			var collider = ray_cast_2d.get_collider()
-			if collider is Player:
+			if collider is Player || collider is Next_Step:
 				return posible_target_tile
 			if collider is Cat and collider.orientation != orientation:
 				return posible_target_tile
-			
-		if ray_cast_2d.is_colliding() || not is_tile_walkable(tile_data) || is_dead_zone(tile_data):
 			facing_direction = facing_direction * -1
 			continue
+			
 		return posible_target_tile
 
 func _on_cup_moving():
@@ -115,4 +121,17 @@ func move_next_step_indicator():
 func _on_area_2d_area_entered(area):
 	if area.get_parent() is Player:
 		next_position = last_position
-		move()
+		move() 
+
+func set_animation_conditions(condition):
+	animation_tree["parameters/conditions/walking"] = false
+	animation_tree["parameters/conditions/attacking"] = false
+	animation_tree[condition] = true
+
+func update_blend_directions():
+	animation_tree["parameters/walk/blend_position"] = facing_direction.x
+	animation_tree["parameters/attack/blend_position"] = facing_direction.x
+
+func _on_animation_tree_animation_finished(anim_name):
+	update_blend_directions()
+	set_animation_conditions("parameters/conditions/walking")

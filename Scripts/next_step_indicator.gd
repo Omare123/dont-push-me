@@ -1,0 +1,1 @@
+class_name Next_Step extends AnimatedSprite2D
