@@ -2726,9 +2726,11 @@ texture = ExtResource("2_7wtd8")
 7:0/0 = 0
 7:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 7:0/0/physics_layer_0/angular_velocity = 0.0
+7:0/0/custom_data_1 = true
 8:0/0 = 0
 8:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 8:0/0/physics_layer_0/angular_velocity = 0.0
+8:0/0/custom_data_1 = true
 9:0/0 = 0
 9:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 9:0/0/physics_layer_0/angular_velocity = 0.0
@@ -2804,9 +2806,11 @@ texture = ExtResource("2_7wtd8")
 7:2/0 = 0
 7:2/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 7:2/0/physics_layer_0/angular_velocity = 0.0
+7:2/0/custom_data_1 = true
 8:2/0 = 0
 8:2/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 8:2/0/physics_layer_0/angular_velocity = 0.0
+8:2/0/custom_data_1 = true
 9:2/0 = 0
 9:2/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 9:2/0/physics_layer_0/angular_velocity = 0.0
@@ -2965,15 +2969,19 @@ texture = ExtResource("2_7wtd8")
 6:3/0 = 0
 6:3/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 6:3/0/physics_layer_0/angular_velocity = 0.0
+6:3/0/custom_data_1 = true
 7:3/0 = 0
 7:3/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 7:3/0/physics_layer_0/angular_velocity = 0.0
+7:3/0/custom_data_1 = true
 8:3/0 = 0
 8:3/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 8:3/0/physics_layer_0/angular_velocity = 0.0
+8:3/0/custom_data_1 = true
 9:3/0 = 0
 9:3/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 9:3/0/physics_layer_0/angular_velocity = 0.0
+9:3/0/custom_data_1 = true
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0ixss"]
 texture = ExtResource("3_awo2u")
@@ -3565,14 +3573,20 @@ tile_map = NodePath("../Level 1")
 [node name="Cat" parent="." node_paths=PackedStringArray("tile_map") instance=ExtResource("5_rtdxt")]
 position = Vector2(120, 136)
 tile_map = NodePath("../Level 1")
+attack_orientation = Vector2(1, 0)
+change_attack_orientation = true
 
 [node name="Cat2" parent="." node_paths=PackedStringArray("tile_map") instance=ExtResource("5_rtdxt")]
 position = Vector2(120, 40)
 tile_map = NodePath("../Level 1")
+attack_orientation = Vector2(1, 0)
+change_attack_orientation = true
 
 [node name="Cat3" parent="." node_paths=PackedStringArray("tile_map") instance=ExtResource("5_rtdxt")]
 position = Vector2(104, 72)
 tile_map = NodePath("../Level 1")
+attack_orientation = Vector2(1, 0)
+change_attack_orientation = true
 
 [node name="Win Area" parent="." instance=ExtResource("6_hgxba")]
 position = Vector2(104, 168)

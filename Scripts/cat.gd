@@ -17,12 +17,14 @@ const SIDE = "S"
 @export var attack_orientation: Vector2 = Vector2(0, 1)
 @export var change_attack_orientation: bool = false
 
+var tween: Tween
 var facing_direction = Vector2i(0, -1)
 var colliding = false
 var last_position: Vector2i
 var next_position: Vector2i
 var moving: bool = false
 var ray_cast_length = 9
+
 func _ready():
 	var current_tile: Vector2i = tile_map.local_to_map(global_position)
 	if current_tile == null:
@@ -37,36 +39,39 @@ func _ready():
 	next_position = get_target_tile(current_tile)
 	move_next_step_indicator()
 	
-func _physics_process(delta):
-	if moving:
+func _physics_process(_delta):
+	if moving || (tween and tween.is_running()):
 		return
+		
 	if ray_cast_2d.is_colliding():
 		var collider = ray_cast_2d.get_collider()
-		if collider is Player:
-			collider.move(attack_orientation, true)
+		if collider is Player and collider.next_position == next_position:
+			collider.handle_attack(attack_orientation)
 			set_animation_conditions("parameters/conditions/attacking")
+	Game.check_allow_to_move()
+	
 func move():
 	if moving:
 		return
-		
+	Game.allow_to_move = false
 	moving = true
 	update_blend_directions()
 	set_animation_conditions("parameters/conditions/walking")
 	var current_tile: Vector2i = tile_map.local_to_map(global_position)
 	var step = tile_map.map_to_local(next_position)
-	var tween := create_tween().set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
+	tween = create_tween().set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
 	tween.tween_property(self, "global_position", global_position - Vector2(0, 1), 0.1)
 	await tween.tween_property(self, "global_position", step, 0.1).finished
 	next_position = get_target_tile(next_position)
 	move_next_step_indicator()
 	last_position = current_tile
 	moving = false
-	Game.check_allow_to_move()
 
 func is_tile_walkable(tile_data: TileData):
 	var slippery
 	if Game.level > 3:
-		tile_data.get_custom_data("slippery")
+		slippery = tile_data.get_custom_data("slippery")
+		
 	if (tile_data == null || tile_data.get_custom_data("walkable") == false || tile_data.get_custom_data("walkable") == null) || slippery != null:
 		return false
 	return true

@@ -7,7 +7,7 @@ var allow_to_move: bool = false
 var levels_cats: Array[Cat] = []
 
 func _ready():
-	get_tree().change_scene_to_file("res://Scenes/level_1.tscn")
+	get_tree().change_scene_to_file("res://Scenes/level_3.tscn")
 
 func next_level():
 	level += 1 
@@ -19,14 +19,21 @@ func set_player(new_player: Player):
 	player = new_player
 	
 func fill_cat_array():
-	var level = get_tree().root.get_child(2).get_children()
-	for node in level:
-		if node is Cat:
+	var level_node = get_tree().root.get_child(2).get_children()
+	for node in level_node:
+		if node is Cat and node != null:
 			levels_cats.append(node)
 	allow_to_move = true
 
 func check_allow_to_move():
-	allow_to_move = !levels_cats.any(cat_is_moving)
-	
-func cat_is_moving(cat: Cat):
-	return cat.moving
+	if allow_to_move:
+		return
+	var can_move = true
+	for cat in levels_cats:
+		if cat == null:
+			continue
+		var cat_is_moving = cat.moving || (cat.tween and cat.tween.is_running())
+		if cat_is_moving:
+			can_move = false
+			break
+	allow_to_move = can_move
