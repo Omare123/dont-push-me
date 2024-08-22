@@ -1,6 +1,7 @@
-[gd_scene load_steps=11 format=3 uid="uid://b8ff6xxw0s0fe"]
+[gd_scene load_steps=12 format=3 uid="uid://b8ff6xxw0s0fe"]
 
 [ext_resource type="Texture2D" uid="uid://b2wr21khpqmyf" path="res://Assets/kitchen_v1.png" id="1_pac1b"]
+[ext_resource type="Script" path="res://Scripts/level.gd" id="1_whjko"]
 [ext_resource type="Texture2D" uid="uid://xy7fvm1i6qna" path="res://Assets/top down kitchen.png" id="2_p5vue"]
 [ext_resource type="Texture2D" uid="uid://dxjxulldw6rxt" path="res://Assets/kitchen.png" id="3_1b86g"]
 [ext_resource type="PackedScene" uid="uid://bsmg6l7hi2bww" path="res://Scenes/cup.tscn" id="4_uo0k0"]
@@ -2725,11 +2726,9 @@ texture = ExtResource("2_p5vue")
 7:0/0 = 0
 7:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 7:0/0/physics_layer_0/angular_velocity = 0.0
-7:0/0/custom_data_0 = true
 8:0/0 = 0
 8:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 8:0/0/physics_layer_0/angular_velocity = 0.0
-8:0/0/custom_data_0 = true
 9:0/0 = 0
 9:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 9:0/0/physics_layer_0/angular_velocity = 0.0
@@ -3509,6 +3508,7 @@ sources/3 = SubResource("TileSetAtlasSource_0ixss")
 sources/2 = SubResource("TileSetAtlasSource_7jf6i")
 
 [node name="Level_2" type="Node2D"]
+script = ExtResource("1_whjko")
 
 [node name="Level 1" type="TileMap" parent="."]
 tile_set = SubResource("TileSet_l6vab")
@@ -3530,14 +3530,14 @@ position = Vector2(104, 40)
 tile_map = NodePath("../Level 1")
 
 [node name="Cat" parent="." node_paths=PackedStringArray("tile_map") instance=ExtResource("5_uf3mi")]
-position = Vector2(104, 136)
+position = Vector2(104, 120)
 tile_map = NodePath("../Level 1")
-orientation = "V"
 
 [node name="Cat2" parent="." node_paths=PackedStringArray("tile_map") instance=ExtResource("5_uf3mi")]
 position = Vector2(88, 136)
 tile_map = NodePath("../Level 1")
-attack_orientation = "F"
+attack_orientation = Vector2(1, 0)
+change_attack_orientation = true
 
 [node name="Win Area" parent="." instance=ExtResource("6_vy3y5")]
 position = Vector2(104, 168)
