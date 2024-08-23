@@ -23,7 +23,7 @@ var colliding = false
 var last_position: Vector2i
 var next_position: Vector2i
 var moving: bool = false
-var ray_cast_length = 9
+var ray_cast_length = 8
 
 func _ready():
 	var current_tile: Vector2i = tile_map.local_to_map(global_position)
@@ -39,17 +39,6 @@ func _ready():
 	next_position = get_target_tile(current_tile)
 	move_next_step_indicator()
 	
-func _physics_process(_delta):
-	if moving || (tween and tween.is_running()):
-		return
-		
-	if ray_cast_2d.is_colliding():
-		var collider = ray_cast_2d.get_collider()
-		if collider is Player and collider.next_position == next_position:
-			collider.handle_attack(attack_orientation)
-			set_animation_conditions("parameters/conditions/attacking")
-	Game.check_allow_to_move()
-	
 func move():
 	if moving:
 		return
@@ -57,22 +46,44 @@ func move():
 	moving = true
 	update_blend_directions()
 	set_animation_conditions("parameters/conditions/walking")
-	var current_tile: Vector2i = tile_map.local_to_map(global_position)
+	var current_tile: Vector2i = get_current_position()
 	var step = tile_map.map_to_local(next_position)
 	tween = create_tween().set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
-	tween.tween_property(self, "global_position", global_position - Vector2(0, 1), 0.1)
-	await tween.tween_property(self, "global_position", step, 0.1).finished
-	next_position = get_target_tile(next_position)
+	tween.tween_property(self, "global_position", global_position - Vector2(0, 1), 0.2)
+	tween.tween_property(self, "global_position", step, 0.2)
+	await tween.finished
+	var posible_next_position = get_target_tile(next_position)
+	if get_current_position() == Game.player.next_position:
+		attack()
+		return
+	next_position = posible_next_position
 	move_next_step_indicator()
 	last_position = current_tile
+	check_attack()
 	moving = false
+		
+	Game.check_allow_to_move()
+
+func attack():
+	set_animation_conditions("parameters/conditions/attacking")
+	Game.player.handle_attack(attack_orientation)
+		
+func check_attack():
+	if Game.player.next_position == next_position:
+		attack()
+		Game.check_allow_to_move()
+	elif Game.player.get_current_position() == get_current_position():
+		attack()
+	elif Game.player.get_current_position() == next_position:
+		attack()
+	Game.check_allow_to_move()
 
 func is_tile_walkable(tile_data: TileData):
 	var slippery
 	if Game.level > 3:
 		slippery = tile_data.get_custom_data("slippery")
 		
-	if (tile_data == null || tile_data.get_custom_data("walkable") == false || tile_data.get_custom_data("walkable") == null) || slippery != null:
+	if (tile_data == null || tile_data.get_custom_data("walkable") == false || tile_data.get_custom_data("walkable") == null) || (slippery != null && slippery != 0):
 		return false
 	return true
 
@@ -116,7 +127,8 @@ func _on_cup_moving():
 
 func move_next_step_indicator():
 	var indicator_tween := next_step_indicator.create_tween().set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN_OUT)
-	await indicator_tween.tween_property(next_step_indicator, "global_position", tile_map.map_to_local(next_position), 0.2).finished
+	indicator_tween.tween_property(next_step_indicator, "global_position", tile_map.map_to_local(next_position), 0.2)
+	await indicator_tween.finished
 
 func set_animation_conditions(condition):
 	animation_tree["parameters/conditions/walking"] = false
@@ -127,6 +139,20 @@ func update_blend_directions():
 	animation_tree["parameters/walk/blend_position"] = facing_direction
 	animation_tree["parameters/attack/blend_position"] = facing_direction
 
-func _on_animation_tree_animation_finished(anim_name):
+func get_current_position():
+	return tile_map.local_to_map(global_position)
+
+func shares_position():
+	next_position = tile_map.local_to_map(global_position)
+	global_position = tile_map.map_to_local(last_position)
+	move_next_step_indicator()
+	if last_position + facing_direction != next_position:
+		facing_direction = facing_direction * -1
+		update_blend_directions()
+
+func _on_animation_tree_animation_finished(anim_name: String):
 	update_blend_directions()
 	set_animation_conditions("parameters/conditions/walking")
+	if anim_name.contains("attack"):
+		get_parent().check_attack(self)
+		moving = false

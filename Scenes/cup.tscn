@@ -62,5 +62,4 @@ stream = SubResource("AudioStreamRandomizer_t6bkw")
 [node name="breaking" type="AudioStreamPlayer2D" parent="sfx"]
 stream = ExtResource("8_e6mpo")
 
-[connection signal="area_entered" from="Area2D" to="." method="_on_area_2d_area_entered"]
 [connection signal="finished" from="sfx/breaking" to="." method="_on_breaking_finished"]

@@ -6,10 +6,12 @@ extends CharacterBody2D
 @onready var objects_ray_cast = $ObjectsRayCast
 @onready var walk = $sfx/walk
 @onready var breaking = $sfx/breaking
+@onready var area_2d = $Area2D
 
 signal moving
 var next_position: Vector2i
 var tween: Tween
+
 func _ready():
 	Game.set_player(self)
 
@@ -42,7 +44,7 @@ func is_slippery(tile_data: TileData):
 
 func handle_attack(direction: Vector2):
 	Game.allow_to_move = false
-	var current_tile: Vector2i = tile_map.local_to_map(global_position)
+	var current_tile: Vector2i = get_current_position()
 	var target_tile: Vector2i = Vector2i(
 		current_tile.x + direction.x,
 		current_tile.y + direction.y
@@ -52,19 +54,15 @@ func handle_attack(direction: Vector2):
 
 	if is_object_in_the_way(direction):
 		return
-		
-	if tween:
-		tween.kill()
-	tween = create_tween().set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
-	
+
 	if (is_tile_dead_zone):
 		move_animation(target_tile)
 		breaking.play()
 		return
-		
+	
 	var slipped = is_slippery(tile_data) and (direction.x == 0 || direction.y == 0)
 	move_animation(target_tile)
-	
+	Game.allow_to_move = true
 	if slipped:
 		handle_slipper(direction, tile_data)
 		return
@@ -89,7 +87,7 @@ func move(direction: Vector2):
 		return
 		
 	Game.allow_to_move = false
-	var current_tile: Vector2i = tile_map.local_to_map(global_position)
+	var current_tile: Vector2i = get_current_position()
 	var target_tile: Vector2i = Vector2i(
 		current_tile.x + direction.x,
 		current_tile.y + direction.y
@@ -101,13 +99,12 @@ func move(direction: Vector2):
 		next_position = current_tile
 		moving.emit()
 		return
-	
-	if tween:
-		tween.kill()
 		
 	var slipped = is_slippery(tile_data) and (direction.x == 0 || direction.y == 0)
-	moving.emit()
 	move_animation(target_tile)
+	moving.emit()
+	await tween.finished
+	
 	if slipped:
 		handle_slipper(direction, tile_data)
 		return
@@ -129,6 +126,9 @@ func is_enemy_in_the_way(direction: Vector2):
 				return true
 	return false
 
+func get_current_position():
+	return tile_map.local_to_map(global_position)
+
 func is_object_in_the_way(direction: Vector2):
 	objects_ray_cast.target_position = direction * 16
 	objects_ray_cast.force_raycast_update()
@@ -138,13 +138,7 @@ func is_object_in_the_way(direction: Vector2):
 			return false
 		return true
 	return false
-	
-func _on_area_2d_area_entered(area):
-	var node = area.get_parent()
-	if node is Cat:
-		node.next_position = node.last_position
-		node.move()
- 
+
 func _on_win_area_body_entered(body):
 	if body == self:
 		Game.next_level()
