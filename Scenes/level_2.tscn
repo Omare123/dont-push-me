@@ -3532,6 +3532,7 @@ tile_map = NodePath("../Level 1")
 [node name="Cat" parent="." node_paths=PackedStringArray("tile_map") instance=ExtResource("5_uf3mi")]
 position = Vector2(120, 120)
 tile_map = NodePath("../Level 1")
+attack_orientation = Vector2(0, -1)
 
 [node name="Cat2" parent="." node_paths=PackedStringArray("tile_map") instance=ExtResource("5_uf3mi")]
 position = Vector2(104, 136)

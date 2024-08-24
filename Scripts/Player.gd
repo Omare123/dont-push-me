@@ -7,6 +7,9 @@ extends CharacterBody2D
 @onready var walk = $sfx/walk
 @onready var breaking = $sfx/breaking
 @onready var area_2d = $Area2D
+@onready var slip = $sfx/slip
+@onready var clink = $sfx/clink
+@onready var broken = $Broken
 
 signal moving
 var next_position: Vector2i
@@ -51,34 +54,57 @@ func handle_attack(direction: Vector2):
 	)
 	var tile_data: TileData = tile_map.get_cell_tile_data(1, target_tile)
 	var is_tile_dead_zone: bool = is_dead_zone(tile_data)
-
+	next_position = target_tile
 	if is_object_in_the_way(direction):
 		return
 
 	if (is_tile_dead_zone):
-		move_animation(target_tile)
+		target_tile = Vector2i(
+		target_tile.x + direction.x,
+		target_tile.y + direction.y
+		)
+		move_animation(target_tile, true)
+		Game.allow_to_move = false
 		breaking.play()
 		return
 	
-	var slipped = is_slippery(tile_data) and (direction.x == 0 || direction.y == 0)
+	var slipped = is_slippery(tile_data)
 	move_animation(target_tile)
+	await tween.finished
 	Game.allow_to_move = true
 	if slipped:
 		handle_slipper(direction, tile_data)
+		get_parent().check_attack()
 		return
-		
+
 func handle_slipper(direction: Vector2, tile_data: TileData):
 	var slippery_value = tile_data.get_custom_data("slippery")
 	var new_direction = slippery_direction(direction, slippery_value)
+	slip.play()
 	handle_attack(new_direction)
 	
-func move_animation(target_tile: Vector2i):
+func move_animation(target_tile: Vector2i, breaking: bool = false):
 	tween = create_tween().set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
-	tween.tween_property(self, "global_position", global_position - Vector2(0, 1), 0.1)
-	tween.tween_property(sprite, "scale", sprite.scale + Vector2(0.1, 0.1), 0.1)
-	tween.tween_property(self, "global_position", tile_map.map_to_local(target_tile), 0.1)
+	tween.tween_property(self, "global_position", global_position - Vector2(0, 1), 0.05)
+	tween.tween_property(sprite, "scale", sprite.scale + Vector2(0.1, 0.1), 0.05)
+	tween.tween_property(self, "global_position", tile_map.map_to_local(target_tile), 0.05)
 	walk.play()
-	tween.tween_property(sprite, "scale", Vector2(1,1), 0.1)
+	tween.tween_property(sprite, "scale", Vector2(1,1), 0.05)
+	moving.emit()
+	await tween.finished
+	if breaking:
+		sprite.visible = false
+		broken.visible = true
+	
+func move_cancel_animation(target_tile: Vector2i, current_tile: Vector2i, direction: Vector2):
+	var half_step = direction * (0.5)
+	tween = create_tween().set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
+	tween.tween_property(self, "global_position", global_position - Vector2(0, 1), 0.05)
+	tween.tween_property(sprite, "scale", sprite.scale + Vector2(0.1, 0.1), 0.05)
+	tween.tween_property(self, "global_position", tile_map.map_to_local(target_tile) - half_step, 0.05)
+	clink.play()
+	tween.tween_property(sprite, "scale", Vector2(1,1), 0.05)
+	tween.tween_property(self, "global_position", tile_map.map_to_local(current_tile), 0.05)
 	moving.emit()
 	await tween.finished
 	
@@ -97,7 +123,7 @@ func move(direction: Vector2):
 	var is_tile_dead_zone: bool = is_dead_zone(tile_data)
 	if !is_tile_walkable(tile_data) || is_tile_dead_zone || is_enemy_in_the_way(direction) || is_object_in_the_way(direction):
 		next_position = current_tile
-		moving.emit()
+		move_cancel_animation(target_tile, current_tile, direction)
 		return
 		
 	var slipped = is_slippery(tile_data) and (direction.x == 0 || direction.y == 0)
@@ -107,6 +133,7 @@ func move(direction: Vector2):
 	
 	if slipped:
 		handle_slipper(direction, tile_data)
+		get_parent().check_attack()
 		return
 
 func slippery_direction(direction: Vector2, slippery_value: int):
@@ -115,6 +142,8 @@ func slippery_direction(direction: Vector2, slippery_value: int):
 	
 	if direction.y == 0:
 		return Vector2(direction.x, slippery_value)
+	
+	return direction
 	
 func is_enemy_in_the_way(direction: Vector2):
 	enemies_ray_cast.target_position = direction * 32

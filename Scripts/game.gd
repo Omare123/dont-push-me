@@ -1,19 +1,17 @@
 extends Node2D
 @onready var game = $"."
-var level: int = 5
+var level: int = 1
 const LEVELS_PATH = "res://Scenes/level_%s.tscn"
 var player: Player
 var allow_to_move: bool = false
 var levels_cats: Array[Cat] = []
 
-func _ready():
-	get_tree().change_scene_to_file("res://Scenes/level_5.tscn")
-
 func next_level():
 	level += 1 
 	levels_cats = []
 	var path: String = LEVELS_PATH % level
-	get_tree().change_scene_to_file(path)
+	MainTransition.change_scene(path)
+	#get_tree().change_scene_to_file(path)
 
 func set_player(new_player: Player):
 	player = new_player

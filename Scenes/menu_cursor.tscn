@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=3 uid="uid://d1fmiyohrjemf"]
+
+[ext_resource type="Texture2D" uid="uid://b2im5mo618535" path="res://Assets/cup.png" id="1_ovipy"]
+[ext_resource type="Script" path="res://Scripts/menu_cursor.gd" id="2_bu5m1"]
+[ext_resource type="PackedScene" uid="uid://dykp8mmw6oyh3" path="res://walk_sound.tscn" id="3_iet30"]
+
+[node name="menu_cursor" type="TextureRect"]
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("1_ovipy")
+script = ExtResource("2_bu5m1")
+cursor_offset = Vector2(18, 0)
+
+[node name="walk" parent="." instance=ExtResource("3_iet30")]

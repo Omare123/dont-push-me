@@ -49,8 +49,8 @@ func move():
 	var current_tile: Vector2i = get_current_position()
 	var step = tile_map.map_to_local(next_position)
 	tween = create_tween().set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
-	tween.tween_property(self, "global_position", global_position - Vector2(0, 1), 0.2)
-	tween.tween_property(self, "global_position", step, 0.2)
+	tween.tween_property(self, "global_position", global_position - Vector2(0, 1), 0.1)
+	tween.tween_property(self, "global_position", step, 0.1)
 	await tween.finished
 	var posible_next_position = get_target_tile(next_position)
 	if get_current_position() == Game.player.next_position:
@@ -154,5 +154,4 @@ func _on_animation_tree_animation_finished(anim_name: String):
 	update_blend_directions()
 	set_animation_conditions("parameters/conditions/walking")
 	if anim_name.contains("attack"):
-		get_parent().check_attack(self)
 		moving = false

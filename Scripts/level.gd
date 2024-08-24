@@ -4,7 +4,7 @@ class_name Level extends Node2D
 func _ready():
 	Game.fill_cat_array()
 
-func check_attack(calling_cat: Cat):
+func check_attack(calling_cat: Cat = null):
 	for cat in Game.levels_cats:
 		if cat == null || cat == calling_cat:
 			continue

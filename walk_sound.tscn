@@ -1,0 +1,23 @@
+[gd_scene load_steps=7 format=3 uid="uid://dykp8mmw6oyh3"]
+
+[ext_resource type="AudioStream" uid="uid://dd2t1drjuvawx" path="res://Assets/SFX/cup_1.wav" id="1_dke1b"]
+[ext_resource type="AudioStream" uid="uid://ceoy3ltxkeq48" path="res://Assets/SFX/cup_2.wav" id="2_qywsr"]
+[ext_resource type="AudioStream" uid="uid://d2boo34tusdf0" path="res://Assets/SFX/cup_3.wav" id="3_u18wj"]
+[ext_resource type="AudioStream" uid="uid://bmhvq0lvaqrx0" path="res://Assets/SFX/cup_4.wav" id="4_3hf4u"]
+[ext_resource type="AudioStream" uid="uid://cu8yglbc008m7" path="res://Assets/SFX/cup_5.wav" id="5_010jv"]
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_t6bkw"]
+streams_count = 5
+stream_0/stream = ExtResource("1_dke1b")
+stream_0/weight = 1.0
+stream_1/stream = ExtResource("2_qywsr")
+stream_1/weight = 1.0
+stream_2/stream = ExtResource("3_u18wj")
+stream_2/weight = 1.0
+stream_3/stream = ExtResource("4_3hf4u")
+stream_3/weight = 1.0
+stream_4/stream = ExtResource("5_010jv")
+stream_4/weight = 1.0
+
+[node name="walk" type="AudioStreamPlayer2D"]
+stream = SubResource("AudioStreamRandomizer_t6bkw")
