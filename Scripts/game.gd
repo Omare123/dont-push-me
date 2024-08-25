@@ -1,7 +1,8 @@
 extends Node2D
 @onready var game = $"."
-var level: int = 7
+var level: int = 1
 const LEVELS_PATH = "res://Scenes/level_%s.tscn"
+const FIRST_LEVEL = "res://Scenes/level_1.tscn"
 var player: Player
 var allow_to_move: bool = false
 var levels_cats: Array[Cat] = []

@@ -56,7 +56,8 @@ func handle_attack(direction: Vector2):
 		current_tile.y + direction.y
 	)
 	var tile_data: TileData = tile_map.get_cell_tile_data(1, target_tile)
-	var is_tile_dead_zone: bool = is_dead_zone(tile_data)
+	var tile_in_the_middle_data: TileData = tile_map.get_cell_tile_data(1, target_tile - Vector2i(direction.x, direction.y))
+	var is_tile_dead_zone: bool = is_dead_zone(tile_data) || is_dead_zone(tile_in_the_middle_data)
 	next_position = target_tile
 	if is_object_in_the_way(direction):
 		return
