@@ -54,7 +54,7 @@ func set_curson_from_index(index: int) -> void:
 
 
 func _on_play_cursor_selected():
-	MainTransition.change_scene("res://Scenes/level_1.tscn")
+	MainTransition.change_scene("res://Scenes/level_7.tscn", 1)
 
 func _on_instructions_cursor_selected():
 	pass

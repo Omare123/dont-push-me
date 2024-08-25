@@ -10,16 +10,19 @@ extends CharacterBody2D
 @onready var slip = $sfx/slip
 @onready var clink = $sfx/clink
 @onready var broken = $Broken
+@onready var animation_player = $AnimationPlayer
 
 signal moving
 var next_position: Vector2i
 var tween: Tween
+var is_moving: bool = false
+var final_scene = false
 
 func _ready():
 	Game.set_player(self)
 
 func _physics_process(_delta):
-	if !Game.allow_to_move:
+	if !Game.allow_to_move and Game.level != 7:
 		return
 	
 	if Input.is_action_pressed("up"):
@@ -108,7 +111,30 @@ func move_cancel_animation(target_tile: Vector2i, current_tile: Vector2i, direct
 	moving.emit()
 	await tween.finished
 	
+func attack(direction: Vector2):
+	if is_moving:
+		return
+	is_moving = true
+	var current_tile: Vector2i = get_current_position()
+	var target_tile: Vector2i = Vector2i(
+		current_tile.x + direction.x,
+		current_tile.y + direction.y
+	)
+	next_position = target_tile
+	var tile_data: TileData = tile_map.get_cell_tile_data(1, target_tile)
+	var is_tile_dead_zone: bool = is_dead_zone(tile_data)
+	if !is_tile_walkable(tile_data) || is_tile_dead_zone || is_breakable_cat_in_the_way(direction):
+		next_position = current_tile
+		move_cancel_animation(target_tile, current_tile, direction)
+		is_moving = false
+		return
+	move_animation(target_tile)
+	await tween.finished
+	is_moving = false
 func move(direction: Vector2):
+	if Game.level == 7:
+		attack(direction)
+		return
 	if !Game.allow_to_move || (tween and tween.is_running()):
 		return
 		
@@ -168,10 +194,31 @@ func is_object_in_the_way(direction: Vector2):
 		return true
 	return false
 
+func is_breakable_cat_in_the_way(direction: Vector2):
+	objects_ray_cast.target_position = direction * 16
+	objects_ray_cast.force_raycast_update()
+	if objects_ray_cast.is_colliding():
+		var collider = objects_ray_cast.get_collider()
+		if collider is Breakable_Cat:
+			collider.move(direction)
+			return true
+		return true
+	return false
+
 func _on_win_area_body_entered(body):
+	if Game.level == 7:
+		final_animation()
+		return
 	if body == self:
 		Game.next_level()
 
+func final_animation():
+	final_scene = true
+	animation_player.play("final_animation")
+	return
 
 func _on_breaking_finished():
-	get_tree().reload_current_scene()
+	if !final_scene:
+		get_tree().reload_current_scene()
+	else:
+		Game.next_level(true)

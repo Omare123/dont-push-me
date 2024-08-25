@@ -1,0 +1,41 @@
+[gd_scene load_steps=7 format=3 uid="uid://yekookb6d0ej"]
+
+[ext_resource type="Script" path="res://Scripts/breakable_cat.gd" id="1_r47pv"]
+[ext_resource type="AudioStream" uid="uid://bw7ushw4gihov" path="res://Assets/SFX/cup_break.wav" id="3_1wblf"]
+[ext_resource type="Texture2D" uid="uid://brtcleprw67bb" path="res://Assets/CatsBlack16x16Tile.png" id="3_omkgl"]
+[ext_resource type="Texture2D" uid="uid://b2dtm84ahqr44" path="res://Assets/broken_cat.png" id="4_4rs5o"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ou1bd"]
+size = Vector2(16, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_o6ws4"]
+size = Vector2(14, 14)
+
+[node name="Cat" type="CharacterBody2D"]
+top_level = true
+script = ExtResource("1_r47pv")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_ou1bd")
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_o6ws4")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("3_omkgl")
+hframes = 8
+vframes = 36
+frame = 7
+
+[node name="attack" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_1wblf")
+bus = &"SFX"
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+target_position = Vector2(0, 16)
+
+[node name="Broken" type="Sprite2D" parent="."]
+visible = false
+texture = ExtResource("4_4rs5o")
